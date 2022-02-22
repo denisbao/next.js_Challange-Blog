@@ -31,9 +31,16 @@ export default function Home() {
       <Head>
         <title>Home</title>
       </Head>
-      <main>
-        <section>
-          <h1>Lista de posts</h1>
+      <main className={styles.container}>
+        <section className={styles.posts}>
+          <a href="#">
+            <h1>Titulo do post</h1>
+            <p>Subtitulo do post</p>
+            <div className={styles.postInfo}>
+              <span>Data de publicacao</span>
+              <span>Autor da publicacao</span>
+            </div>
+          </a>
         </section>
       </main>
     </>

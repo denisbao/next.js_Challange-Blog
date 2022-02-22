@@ -1,1 +1,35 @@
-// TODO
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.posts {
+
+  h1 {
+    font-size: 2rem;
+    line-height: 3.5rem;
+    font-weight: bold;
+  }
+
+  p {
+    color: var(--body);
+    font-style: normal;
+    font-weight: normal;
+    font-size: 1.1rem;
+    line-height: 2rem;
+    text-align: justify;
+    margin-bottom: 1.2rem;
+  }
+
+  .postInfo {
+    display: flex;
+    font-size: 0.9rem;
+    line-height: 1rem;
+    color: var(--info);
+    
+    span {
+      margin-right: 1.5rem;
+    }
+  }
+}
