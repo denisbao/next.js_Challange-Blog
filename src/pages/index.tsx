@@ -41,6 +41,15 @@ export default function Home() {
               <span>Autor da publicacao</span>
             </div>
           </a>
+
+          <a href="#">
+            <h1>Titulo do post</h1>
+            <p>Subtitulo do post</p>
+            <div className={styles.postInfo}>
+              <span>Data de publicacao</span>
+              <span>Autor da publicacao</span>
+            </div>
+          </a>
         </section>
       </main>
     </>

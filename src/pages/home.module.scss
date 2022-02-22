@@ -6,6 +6,17 @@
 
 .posts {
 
+  a {
+    display: block;
+
+    & + a {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-700);
+    }
+  }
+  
+
   h1 {
     font-size: 2rem;
     line-height: 3.5rem;
