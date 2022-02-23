@@ -1,15 +1,18 @@
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import Prismic from '@prismicio/client';
 import { FiCalendar } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
+import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
 import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
+import { MorePostsButton } from '../components/MorePostsButton';
 
 type Post = {
-  uid?: string;
+  slug?: string;
   first_publication_date: string | null;
   data: {
     title: string;
@@ -32,22 +35,25 @@ export default function Home({ posts, next_page }: HomeProps) {
       <main className={styles.container}>
         <section className={styles.posts}>
           {posts.map(post => (
-            <a key={post.uid}>
-              <h1>{post.data.title}</h1>
-              <p>{post.data.subtitle}</p>
-              <div className={styles.postInfo}>
-                <span>
-                  <FiCalendar className={styles.marginRight} />
-                  {post.first_publication_date}
-                </span>
-                <span>
-                  <FiUser className={styles.marginRight} />
-                  {post.data.author}
-                </span>
-              </div>
-            </a>
+            <Link href={`/post/${post.slug}`} key={post.slug}>
+              <a>
+                <h1>{post.data.title}</h1>
+                <p>{post.data.subtitle}</p>
+                <div className={styles.postInfo}>
+                  <span>
+                    <FiCalendar className={styles.marginRight} />
+                    {post.first_publication_date}
+                  </span>
+                  <span>
+                    <FiUser className={styles.marginRight} />
+                    {post.data.author}
+                  </span>
+                </div>
+              </a>
+            </Link>
           ))}
         </section>
+        <MorePostsButton />
       </main>
     </>
   );
@@ -55,12 +61,16 @@ export default function Home({ posts, next_page }: HomeProps) {
 
 export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
-  const postsResponse = await prismic.query('');
+  // const postsResponse = await prismic.query('');
+  const postsResponse = await prismic.query(
+    Prismic.Predicates.at('document.type', 'post'),
+    { pageSize: 10 }
+  );
 
   const nextPage = postsResponse.next_page;
   const posts = postsResponse.results.map(post => {
     return {
-      uid: post.uid,
+      slug: post.uid,
       first_publication_date: new Date(
         post.first_publication_date
       ).toLocaleDateString('pt-BR', {
@@ -77,7 +87,7 @@ export const getStaticProps: GetStaticProps = async () => {
   });
 
   // console.log(JSON.stringify(postsResponse, null, 2));
-  // console.log(posts);
+  console.log(nextPage);
 
   return {
     props: {
