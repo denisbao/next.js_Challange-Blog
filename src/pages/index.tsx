@@ -22,11 +22,47 @@ type Post = {
 };
 
 interface HomeProps {
-  next_page: string;
-  posts: Post[];
+  response: {
+    nextPage: string;
+    posts: Post[];
+  };
 }
 
-export default function Home({ posts, next_page }: HomeProps) {
+export default function Home({ response }: HomeProps) {
+  const [postList, setPostList] = useState(response);
+
+  function handleMorePages() {
+    fetch(response.nextPage)
+      .then(resp => resp.json())
+      .then(data => {
+        const newPosts = data.results.map(post => {
+          return {
+            slug: post.uid,
+            first_publication_date: new Date(
+              post.first_publication_date
+            ).toLocaleDateString('pt-BR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric',
+            }),
+            data: {
+              title: post.data.title,
+              subtitle: post.data.subtitle,
+              author: post.data.author,
+            },
+          };
+        });
+
+        const formatResponse = {
+          nextPage: data.next_page,
+          posts: [...response.posts, newPosts],
+        };
+
+        setPostList(formatResponse);
+        console.log(newPosts);
+      });
+  }
+
   return (
     <>
       <Head>
@@ -34,7 +70,7 @@ export default function Home({ posts, next_page }: HomeProps) {
       </Head>
       <main className={styles.container}>
         <section className={styles.posts}>
-          {posts.map(post => (
+          {postList.posts.map(post => (
             <Link href={`/post/${post.slug}`} key={post.slug}>
               <a>
                 <h1>{post.data.title}</h1>
@@ -53,6 +89,9 @@ export default function Home({ posts, next_page }: HomeProps) {
             </Link>
           ))}
         </section>
+        <button type="button" onClick={handleMorePages}>
+          test
+        </button>
         <MorePostsButton />
       </main>
     </>
@@ -64,35 +103,55 @@ export const getStaticProps: GetStaticProps = async () => {
   // const postsResponse = await prismic.query('');
   const postsResponse = await prismic.query(
     Prismic.Predicates.at('document.type', 'post'),
-    { pageSize: 10 }
+    { pageSize: 1 }
   );
 
-  const nextPage = postsResponse.next_page;
-  const posts = postsResponse.results.map(post => {
-    return {
-      slug: post.uid,
-      first_publication_date: new Date(
-        post.first_publication_date
-      ).toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      }),
-      data: {
-        title: post.data.title,
-        subtitle: post.data.subtitle,
-        author: post.data.author,
-      },
-    };
-  });
+  // const nextPage = postsResponse.next_page;
+  // const posts = postsResponse.results.map(post => {
+  //   return {
+  //     slug: post.uid,
+  //     first_publication_date: new Date(
+  //       post.first_publication_date
+  //     ).toLocaleDateString('pt-BR', {
+  //       day: '2-digit',
+  //       month: 'long',
+  //       year: 'numeric',
+  //     }),
+  //     data: {
+  //       title: post.data.title,
+  //       subtitle: post.data.subtitle,
+  //       author: post.data.author,
+  //     },
+  //   };
+  // });
 
-  // console.log(JSON.stringify(postsResponse, null, 2));
-  console.log(nextPage);
+  const response = {
+    nextPage: postsResponse.next_page,
+    posts: postsResponse.results.map(post => {
+      return {
+        slug: post.uid,
+        first_publication_date: new Date(
+          post.first_publication_date
+        ).toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        }),
+        data: {
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
+        },
+      };
+    }),
+  };
+
+  console.log(JSON.stringify(response, null, 2));
+  // console.log(nextPage);
 
   return {
     props: {
-      posts,
-      nextPage,
+      response,
     },
   };
 };
