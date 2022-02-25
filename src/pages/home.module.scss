@@ -10,8 +10,8 @@
     display: block;
 
     & + a {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
+      margin-top: 2.5rem;
+      padding-top: 2.5rem;
       border-top: 1px solid var(--gray-700);
     }
   }
@@ -19,8 +19,9 @@
 
   h1 {
     font-size: 2rem;
-    line-height: 3.5rem;
+    line-height: 2.5rem;
     font-weight: bold;
+    padding-bottom: 1rem;
   }
 
   p {
@@ -30,7 +31,7 @@
     font-size: 1.1rem;
     line-height: 2rem;
     text-align: justify;
-    margin-bottom: 1.2rem;
+    margin-bottom: 0.5rem;
   }
 
   .postInfo {

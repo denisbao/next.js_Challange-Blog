@@ -1,13 +1,13 @@
+/* eslint-disable react/jsx-no-bind */
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
 import Prismic from '@prismicio/client';
 import { FiCalendar } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
-import commonStyles from '../styles/common.module.scss';
 import styles from './home.module.scss';
 import { MorePostsButton } from '../components/MorePostsButton';
 
@@ -23,7 +23,7 @@ type Post = {
 
 interface HomeProps {
   response: {
-    nextPage: string;
+    nextPageUrl: string;
     posts: Post[];
   };
 }
@@ -31,8 +31,8 @@ interface HomeProps {
 export default function Home({ response }: HomeProps) {
   const [postList, setPostList] = useState(response);
 
-  function handleMorePages() {
-    fetch(response.nextPage)
+  function handleLoadMorePosts() {
+    fetch(response.nextPageUrl)
       .then(resp => resp.json())
       .then(data => {
         const newPosts = data.results.map(post => {
@@ -54,12 +54,11 @@ export default function Home({ response }: HomeProps) {
         });
 
         const formatResponse = {
-          nextPage: data.next_page,
-          posts: [...response.posts, newPosts],
+          nextPageUrl: data.next_page,
+          posts: response.posts.concat(newPosts),
         };
-
+        console.log(formatResponse.nextPageUrl);
         setPostList(formatResponse);
-        console.log(newPosts);
       });
   }
 
@@ -89,10 +88,7 @@ export default function Home({ response }: HomeProps) {
             </Link>
           ))}
         </section>
-        <button type="button" onClick={handleMorePages}>
-          test
-        </button>
-        <MorePostsButton />
+        <MorePostsButton loadPosts={handleLoadMorePosts} />
       </main>
     </>
   );
@@ -106,7 +102,7 @@ export const getStaticProps: GetStaticProps = async () => {
     { pageSize: 1 }
   );
 
-  // const nextPage = postsResponse.next_page;
+  // const nextPageUrl = postsResponse.next_page;
   // const posts = postsResponse.results.map(post => {
   //   return {
   //     slug: post.uid,
@@ -126,7 +122,7 @@ export const getStaticProps: GetStaticProps = async () => {
   // });
 
   const response = {
-    nextPage: postsResponse.next_page,
+    nextPageUrl: postsResponse.next_page,
     posts: postsResponse.results.map(post => {
       return {
         slug: post.uid,
@@ -146,8 +142,8 @@ export const getStaticProps: GetStaticProps = async () => {
     }),
   };
 
-  console.log(JSON.stringify(response, null, 2));
-  // console.log(nextPage);
+  // console.log(JSON.stringify(response, null, 2));
+  console.log(response.nextPageUrl);
 
   return {
     props: {
