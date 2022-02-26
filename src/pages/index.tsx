@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Prismic from '@prismicio/client';
 import { FiCalendar } from 'react-icons/fi';
 import { FiUser } from 'react-icons/fi';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
 
 import styles from './home.module.scss';
@@ -32,10 +32,10 @@ export default function Home({ response }: HomeProps) {
   const [postList, setPostList] = useState(response);
 
   function handleLoadMorePosts() {
-    fetch(response.nextPageUrl)
+    fetch(postList.nextPageUrl)
       .then(resp => resp.json())
       .then(data => {
-        const newPosts = data.results.map(post => {
+        const nextPagePosts = data.results.map(post => {
           return {
             slug: post.uid,
             first_publication_date: new Date(
@@ -52,13 +52,14 @@ export default function Home({ response }: HomeProps) {
             },
           };
         });
-
-        const formatResponse = {
-          nextPageUrl: data.next_page,
-          posts: response.posts.concat(newPosts),
+        const formatedResponse = {
+          response: {
+            nextPageUrl: data.next_page,
+            posts: postList.posts.concat(nextPagePosts),
+          },
         };
-        console.log(formatResponse.nextPageUrl);
-        setPostList(formatResponse);
+        console.log(formatedResponse.response.posts);
+        setPostList(formatedResponse.response);
       });
   }
 
@@ -99,27 +100,8 @@ export const getStaticProps: GetStaticProps = async () => {
   // const postsResponse = await prismic.query('');
   const postsResponse = await prismic.query(
     Prismic.Predicates.at('document.type', 'post'),
-    { pageSize: 1 }
+    { pageSize: 4 }
   );
-
-  // const nextPageUrl = postsResponse.next_page;
-  // const posts = postsResponse.results.map(post => {
-  //   return {
-  //     slug: post.uid,
-  //     first_publication_date: new Date(
-  //       post.first_publication_date
-  //     ).toLocaleDateString('pt-BR', {
-  //       day: '2-digit',
-  //       month: 'long',
-  //       year: 'numeric',
-  //     }),
-  //     data: {
-  //       title: post.data.title,
-  //       subtitle: post.data.subtitle,
-  //       author: post.data.author,
-  //     },
-  //   };
-  // });
 
   const response = {
     nextPageUrl: postsResponse.next_page,
@@ -143,7 +125,6 @@ export const getStaticProps: GetStaticProps = async () => {
   };
 
   // console.log(JSON.stringify(response, null, 2));
-  console.log(response.nextPageUrl);
 
   return {
     props: {
