@@ -63,6 +63,13 @@ export default function Home({ response }: HomeProps) {
       });
   }
 
+  function hasMorePosts() {
+    if (postList.nextPageUrl) {
+      return <MorePostsButton loadPosts={handleLoadMorePosts} />;
+    }
+    return null;
+  }
+
   return (
     <>
       <Head>
@@ -89,7 +96,8 @@ export default function Home({ response }: HomeProps) {
             </Link>
           ))}
         </section>
-        <MorePostsButton loadPosts={handleLoadMorePosts} />
+        {hasMorePosts()}
+        <div className={styles.endSpace} />
       </main>
     </>
   );
@@ -100,7 +108,7 @@ export const getStaticProps: GetStaticProps = async () => {
   // const postsResponse = await prismic.query('');
   const postsResponse = await prismic.query(
     Prismic.Predicates.at('document.type', 'post'),
-    { pageSize: 4 }
+    { pageSize: 2 }
   );
 
   const response = {

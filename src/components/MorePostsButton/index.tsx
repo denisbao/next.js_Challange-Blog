@@ -6,8 +6,14 @@ interface MorePostsButtonProps {
 
 export function MorePostsButton({ loadPosts }: MorePostsButtonProps) {
   return (
-    <button className={styles.loadMoreButton} type="button" onClick={loadPosts}>
-      Carregar mais posts
-    </button>
+    <div className={styles.container}>
+      <button
+        className={styles.loadMoreButton}
+        type="button"
+        onClick={loadPosts}
+      >
+        Carregar mais posts
+      </button>
+    </div>
   );
 }
